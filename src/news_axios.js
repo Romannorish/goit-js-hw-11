@@ -35,7 +35,7 @@ function onSubmit(e) {
 
   
 
- 
+  // якщо введено слово рендери розмітку на екраан,очищай інпут і роби кнопку завантажити ще, активною
   newsApiService
     .fetchImage()
     .then(({ hits, totalHits }) => {
