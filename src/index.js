@@ -1,8 +1,7 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import './css/styles.css';
-import NewsApiService from './news_axios';
+import NewsApiService from './news-service';
 // import renderCard  from './renderCard';
-
 
 const refs = {
   formEl: document.querySelector('.search-form'),
@@ -12,24 +11,21 @@ const refs = {
   buttonLoad: document.querySelector('.load-more'),
 };
 
-
-const newsApiServise = new newsApiServise();
+const newsApiService = new NewsApiService();
 let totalPages = null;
 refs.formEl.addEventListener('submit', onSubmit);
 refs.buttonLoad.addEventListener('click', onLoadMore);
 
 
-
 function onSubmit(e) {
-  e.preverentDefault();
-  newsApiServise.form = e.currentTarget;
-  newsApiServise.form = e.currentTarget.elements.searchQuery.value.trim();
-}
-
-NewsApiService.resetPage();
+  e.preventDefault();
+  newsApiService.form = e.currentTarget;
+  newsApiService.query = e.currentTarget.elements.searchQuery.value.trim();
+ 
+  newsApiService.resetPage();
   refs.galleryEl.innerHTML = '';
 
-  if (NewsApiService.query === '') {
+  if (newsApiService.query === '') {
     Notify.failure(
       ' please fill the  field.'
       );
@@ -39,8 +35,8 @@ NewsApiService.resetPage();
 
   
 
-  
-  NewsApiService
+ 
+  newsApiService
     .fetchImage()
     .then(({ hits, totalHits }) => {
       if (hits.length === 0 ) {
@@ -54,7 +50,7 @@ NewsApiService.resetPage();
       refs.buttonLoad.classList.remove('is-hidden');
       totalPages = Math.ceil(totalHits / 40);
       
-      if (NewsApiService.page === totalPages) {
+      if (newsApiService.page === totalPages) {
         refs.buttonLoad.classList.add('is-hidden');
         Notify.failure(
           `We're sorry, but you've reached the end of search results`
@@ -62,8 +58,8 @@ NewsApiService.resetPage();
       }
     })
     .catch()
-    .finally(() => NewsApiService.form.reset());
-
+    .finally(() => newsApiService.form.reset());
+}
 
 function renderCard(img) {
   refs.galleryEl.insertAdjacentHTML('beforeend', markupGallery(img));
@@ -112,20 +108,20 @@ function markupGallery(data) {
 
 
 function onLoadMore() {
-  NewsApiService.incrementPage();
-  NewsApiService
+  newsApiService.incrementPage();
+  newsApiService
     .fetchImage()
     .then(({ hits, totalHits }) => {
       console.log(totalHits);
       renderCard(hits);
       // newsApiService.incrementPage();
-      console.log(NewsApiService.page);
+      console.log(newsApiService.page);
       // if (hits.length < 40) {
       //   refs.buttonLoad.classList.add('is-hidden');
       // }
      
       console.log(totalPages);
-      if (NewsApiService.page === totalPages) {
+      if (newsApiService.page === totalPages) {
         refs.buttonLoad.classList.add('is-hidden');
         Notify.failure(
           `We're sorry, but you've reached the end of search results`
@@ -134,4 +130,3 @@ function onLoadMore() {
     })
     .catch(error => console.log(error));
 }
-
